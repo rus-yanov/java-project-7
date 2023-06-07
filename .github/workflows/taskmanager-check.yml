@@ -1,0 +1,39 @@
+# Name of workflow
+name: Basic validation
+
+# Trigger the workflow on push or pull request
+on:
+  - push
+  - pull_request
+
+
+jobs:
+  build:
+
+    # The type of machine to run the job on
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v3
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v3.10.0
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Gradle Build Action
+        uses: gradle/gradle-build-action@v2.3.3
+        with:
+          arguments: build
+          build-root-directory: app
+
+      - name: Publish code coverage
+        uses: paambaati/codeclimate-action@v3.0.0
+        env:
+          CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
+          JACOCO_SOURCE_PATH: app/src/main/java
+        with:
+          coverageCommand: make report
+          coverageLocations: ${{github.workspace}}/app/build/jacocoReport/test/jacocoTestReport.xml:jacoco

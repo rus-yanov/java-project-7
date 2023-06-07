@@ -1,0 +1,8 @@
+server:
+  port: ${PORT:5001}
+
+logging:
+  level:
+    root: INFO
+
+base-url: /api
