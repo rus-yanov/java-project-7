@@ -1,8 +1,19 @@
-server:
-  port: ${PORT:5001}
+#  profiles:
+#  active: "prod"
 
-logging:
-  level:
-    root: INFO
+server:
+  port: ${PORT:8080}
 
 base-url: /api
+
+spring:
+  application:
+    name: taskManager
+
+  liquibase:
+    enabled: true
+    change-log:  classpath:db/changelog/db.changelog-master.yaml
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
