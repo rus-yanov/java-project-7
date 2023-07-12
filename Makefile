@@ -1,5 +1,5 @@
 setup:
-	gradle wrapper --gradle-version 7.4
+	gradle wrapper --gradle-version 7.4.2
 
 clean:
 	gradle clean

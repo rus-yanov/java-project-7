@@ -2,7 +2,7 @@
 #  active: "prod"
 
 server:
-  port: ${PORT:8080}
+  port: ${PORT:8090}
 
 base-url: /api
 
