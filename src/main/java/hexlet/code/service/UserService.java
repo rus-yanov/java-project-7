@@ -5,12 +5,12 @@ import hexlet.code.model.User;
 
 
 public interface UserService {
-	User createNewUser(UserDto userDto);
+    User createNewUser(UserDto userDto);
 
-	User updateUser(long id, UserDto userDto);
+    User updateUser(long id, UserDto userDto);
 
-	String getCurrentUserId();
+    String getCurrentUserId();
 
-	User getCurrentUser();
+    User getCurrentUser();
 
 }

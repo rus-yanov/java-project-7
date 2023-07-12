@@ -18,10 +18,10 @@ import static hexlet.code.config.SpringConfigForIT.TEST_PROFILE;
 @PropertySource(value = "classpath:/config/application.yml")
 public class SpringConfigForIT {
 
-	public static final String TEST_PROFILE = "test";
+    public static final String TEST_PROFILE = "test";
 
-	@Bean
-	public RestTemplate restTemplate() {
-		return new RestTemplateBuilder().build();
-	}
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplateBuilder().build();
+    }
 }

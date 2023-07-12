@@ -24,41 +24,41 @@ import static hexlet.code.controller.UserController.USER_CONTROLLER_PATH;
 @RestController
 @RequestMapping("${base-url}" + USER_CONTROLLER_PATH)
 public class UserController {
-	public static final String USER_CONTROLLER_PATH = "/users";
-	public static final String ID = "/{id}";
-	private static final String ONLY_OWNER_BY_ID = """
+    public static final String USER_CONTROLLER_PATH = "/users";
+    public static final String ID = "/{id}";
+    private static final String ONLY_OWNER_BY_ID = """
             @userRepository.findById(#id).get().getEmail() == authentication.getName()
         """;
 
-	private final UserService userService;
-	private final UserRepository userRepository;
+    private final UserService userService;
+    private final UserRepository userRepository;
 
-	@PostMapping
-	public User createUser(@Valid @RequestBody UserDto userDto) {
-		return userService.createNewUser(userDto);
-	}
+    @PostMapping
+    public User createUser(@Valid @RequestBody UserDto userDto) {
+        return userService.createNewUser(userDto);
+    }
 
-	@GetMapping
-	public List<User> getAll() {
-		return userRepository.findAll()
-				.stream()
-				.toList();
-	}
+    @GetMapping
+    public List<User> getAll() {
+        return userRepository.findAll()
+                .stream()
+                .toList();
+    }
 
-	@GetMapping(ID)
-	public User getCurrentUser(@PathVariable final Long id) {
-		return userRepository.findById(id).get();
-	}
+    @GetMapping(ID)
+    public User getCurrentUser(@PathVariable final Long id) {
+        return userRepository.findById(id).get();
+    }
 
-	@PutMapping(ID)
-	@PreAuthorize(ONLY_OWNER_BY_ID)
-	public User updateUser(@PathVariable final long id, @RequestBody @Valid final UserDto dto)  {
-		return userService.updateUser(id, dto);
-	}
+    @PutMapping(ID)
+    @PreAuthorize(ONLY_OWNER_BY_ID)
+    public User updateUser(@PathVariable final long id, @RequestBody @Valid final UserDto dto)  {
+        return userService.updateUser(id, dto);
+    }
 
-	@DeleteMapping(ID)
-	@PreAuthorize(ONLY_OWNER_BY_ID)
-	public void delete(@PathVariable final long id) {
-		userRepository.deleteById(id);
-	}
+    @DeleteMapping(ID)
+    @PreAuthorize(ONLY_OWNER_BY_ID)
+    public void delete(@PathVariable final long id) {
+        userRepository.deleteById(id);
+    }
 }

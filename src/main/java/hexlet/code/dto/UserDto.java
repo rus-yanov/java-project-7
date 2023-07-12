@@ -13,18 +13,18 @@ import jakarta.validation.constraints.Size;
 @AllArgsConstructor
 public class UserDto {
 
-	@NotBlank
-	@Email
-	private String email;
+    @NotBlank
+    @Email
+    private String email;
 
-	@NotBlank
-	private String firstName;
+    @NotBlank
+    private String firstName;
 
-	@NotBlank
-	private String lastName;
+    @NotBlank
+    private String lastName;
 
-	@NotBlank
-	@Size(min = 3, max = 100)
-	private String password;
+    @NotBlank
+    @Size(min = 3, max = 100)
+    private String password;
 
 }

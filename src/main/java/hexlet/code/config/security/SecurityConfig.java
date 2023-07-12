@@ -28,44 +28,44 @@ import static org.springframework.http.HttpMethod.POST;
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
-	public static final String LOGIN = "/login";
-	public static final List<GrantedAuthority> DEFAULT_AUTHORITIES = List.of(new SimpleGrantedAuthority("USER"));
-	private final UserDetailsService userDetailsService;
-	private final JWTHelper jwtHelper;
-	private final String baseUrl;
-	private final RequestMatcher loginRequest;
-	private final RequestMatcher publicUrls;
+    public static final String LOGIN = "/login";
+    public static final List<GrantedAuthority> DEFAULT_AUTHORITIES = List.of(new SimpleGrantedAuthority("USER"));
+    private final UserDetailsService userDetailsService;
+    private final JWTHelper jwtHelper;
+    private final String baseUrl;
+    private final RequestMatcher loginRequest;
+    private final RequestMatcher publicUrls;
 
-	public SecurityConfig(@Value("${base-url}") final String baseUrl,
-	                      final UserDetailsService userDetailsService,
-	                      final JWTHelper jwtHelper) {
-		this.baseUrl = baseUrl;
-		this.userDetailsService = userDetailsService;
-		this.jwtHelper = jwtHelper;
-		this.loginRequest = new AntPathRequestMatcher(baseUrl + LOGIN, POST.toString());
-		this.publicUrls = new OrRequestMatcher(
-				loginRequest,
-				new AntPathRequestMatcher(baseUrl + USER_CONTROLLER_PATH, POST.toString()),
-				new AntPathRequestMatcher(baseUrl + USER_CONTROLLER_PATH, GET.toString()),
-				new NegatedRequestMatcher(new AntPathRequestMatcher(baseUrl + "/**"))
-		);
-	}
+    public SecurityConfig(@Value("${base-url}") final String baseUrl,
+                          final UserDetailsService userDetailsService,
+                          final JWTHelper jwtHelper) {
+        this.baseUrl = baseUrl;
+        this.userDetailsService = userDetailsService;
+        this.jwtHelper = jwtHelper;
+        this.loginRequest = new AntPathRequestMatcher(baseUrl + LOGIN, POST.toString());
+        this.publicUrls = new OrRequestMatcher(
+                loginRequest,
+                new AntPathRequestMatcher(baseUrl + USER_CONTROLLER_PATH, POST.toString()),
+                new AntPathRequestMatcher(baseUrl + USER_CONTROLLER_PATH, GET.toString()),
+                new NegatedRequestMatcher(new AntPathRequestMatcher(baseUrl + "/**"))
+        );
+    }
 
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-	@Bean
-	public DaoAuthenticationProvider authenticationProvider() {
-		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-		authProvider.setUserDetailsService(userDetailsService);
-		authProvider.setPasswordEncoder(passwordEncoder());
-		return authProvider;
-	}
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
 
-	@Bean
-	public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
-		return authConfig.getAuthenticationManager();
-	}
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
+    }
 }
