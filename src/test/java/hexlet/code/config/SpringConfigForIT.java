@@ -11,7 +11,6 @@ import org.springframework.web.client.RestTemplate;
 
 import static hexlet.code.config.SpringConfigForIT.TEST_PROFILE;
 
-
 @Configuration
 @Profile(TEST_PROFILE)
 @EnableAspectJAutoProxy

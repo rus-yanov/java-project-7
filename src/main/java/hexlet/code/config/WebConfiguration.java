@@ -1,7 +1,5 @@
 package hexlet.code.config;
 
-import java.io.IOException;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
@@ -35,7 +33,7 @@ public class WebConfiguration implements WebMvcConfigurer {
 				.resourceChain(true)
 				.addResolver(new PathResourceResolver() {
 					@Override
-					protected Resource getResource(String resourcePath, Resource location) throws IOException {
+					protected Resource getResource(String resourcePath, Resource location) {
 						if (resourcePath.startsWith(baseApiPath) || resourcePath.startsWith(
 								baseApiPath.substring(1))) {
 							return null;
