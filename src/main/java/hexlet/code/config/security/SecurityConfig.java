@@ -104,6 +104,5 @@ public class SecurityConfig {
                 .sessionManagement(management -> management.disable())
                 .logout(logout -> logout.disable())
                 .build();
-
     }
 }

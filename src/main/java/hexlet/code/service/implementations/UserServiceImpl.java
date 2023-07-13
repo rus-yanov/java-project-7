@@ -1,4 +1,4 @@
-package hexlet.code.service.impl;
+package hexlet.code.service.implementations;
 
 import hexlet.code.dto.UserDto;
 import hexlet.code.model.User;
