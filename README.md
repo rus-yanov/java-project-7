@@ -7,8 +7,8 @@ Allows to set tasks, assign performers and change their statuses.
 [![Test Coverage](https://api.codeclimate.com/v1/badges/defaed3f07cda0a16b4e/test_coverage)](https://codeclimate.com/github/rus-yanov/java-project-73/test_coverage)
 
 ## The stack used:
-* Java 17;
-* Gradle 7;
+* Java 20;
+* Gradle 8.2;
 * Spring Boot, Spring Web, Spring Data JPA, Spring Security;
 * Liquibase;
 * QueryDSL;
@@ -18,8 +18,8 @@ Allows to set tasks, assign performers and change their statuses.
 
 ## Requirements:
 Before you can build this project, you must install and configure the following dependencies:
-* JDK 17
-* Gradle 7.4
+* JDK 20
+* Gradle 8.2
 * Node.js 16.13.1
 
 ## Build application
