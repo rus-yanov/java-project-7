@@ -131,7 +131,7 @@ liquibase {
 // Сборка фронтенда.
 // Выполняется только если ничего не изменилось.
 // *****************************************************************************
-/*frontend {
+frontend {
 	nodeVersion = '16.13.1'
 	installScript = 'install'
 	assembleScript = 'run build'
@@ -159,7 +159,9 @@ installFrontend {
 }
 
 processResources.dependsOn assembleFrontend
-*/
+// *****************************************************************************
+
+
 // Таска нужная heroku для деплоя
 task stage(dependsOn: [clean, installDist])
 installDist.mustRunAfter clean
