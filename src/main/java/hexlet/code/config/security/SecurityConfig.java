@@ -85,11 +85,12 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf().disable()
-                .authorizeHttpRequests()
-                .requestMatchers(publicUrls).permitAll()
-                .anyRequest().authenticated().and()
+        return http
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/token/**").permitAll()
+                        .anyRequest().authenticated()
+                )
                 .addFilter(new JWTAuthenticationFilter(
                         authenticationManager(http.getSharedObject(AuthenticationConfiguration.class)),
                         loginRequest,
@@ -99,10 +100,10 @@ public class SecurityConfig {
                         new JWTAuthorizationFilter(publicUrls, jwtHelper),
                         UsernamePasswordAuthenticationFilter.class
                 )
-                .formLogin().disable()
-                .sessionManagement().disable()
-                .logout().disable();
+                .formLogin(login -> login.disable())
+                .sessionManagement(management -> management.disable())
+                .logout(logout -> logout.disable())
+                .build();
 
-        return http.build();
     }
 }
