@@ -37,7 +37,7 @@ public class TaskStatusController {
     @PostMapping()
     @ResponseStatus(CREATED)
     public TaskStatus createTaskStatus(@RequestBody @Valid TaskStatusDto taskStatusDto) {
-        return taskStatusService.createNewTaskStatus(taskStatusDto);
+        return taskStatusService.createStatus(taskStatusDto);
     }
 
     @GetMapping
@@ -52,7 +52,7 @@ public class TaskStatusController {
 
     @PutMapping(ID)
     public TaskStatus updateTaskStatus(@PathVariable Long id, @RequestBody @Valid TaskStatusDto taskStatusDto) {
-        return taskStatusService.updateTaskStatus(id, taskStatusDto);
+        return taskStatusService.updateStatus(taskStatusDto, id);
     }
 
     @DeleteMapping(ID)

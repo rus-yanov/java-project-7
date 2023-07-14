@@ -8,23 +8,43 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional
 @AllArgsConstructor
 public class TaskStatusServiceImpl implements TaskStatusService {
-
     private final TaskStatusRepository taskStatusRepository;
+
     @Override
-    public TaskStatus updateTaskStatus(long id, TaskStatusDto taskStatusDto) {
-        TaskStatus updateTaskStatus = taskStatusRepository.findById(id).get();
-        updateTaskStatus.setName(taskStatusDto.getName());
-        return taskStatusRepository.save(updateTaskStatus);
+    public TaskStatus getStatus(long id) {
+        return taskStatusRepository.findById(id)
+                .orElseThrow();
     }
 
     @Override
-    public TaskStatus createNewTaskStatus(TaskStatusDto taskStatusDto) {
-        TaskStatus newTaskStatus = new TaskStatus();
-        newTaskStatus.setName(taskStatusDto.getName());
-        return taskStatusRepository.save(newTaskStatus);
+    public List<TaskStatus> getStatuses() {
+        return taskStatusRepository.findAll();
+    }
+
+    @Override
+    public TaskStatus createStatus(TaskStatusDto taskStatusDto) {
+        final TaskStatus taskStatus = new TaskStatus();
+        taskStatus.setName(taskStatusDto.getName());
+        taskStatusRepository.save(taskStatus);
+        return taskStatus;
+    }
+
+    @Override
+    public TaskStatus updateStatus(TaskStatusDto taskStatusDto, long id) {
+        final TaskStatus taskStatus = getStatus(id);
+        taskStatus.setName(taskStatusDto.getName());
+        return taskStatusRepository.save(taskStatus);
+    }
+
+    @Override
+    public void deleteStatus(long id) {
+        final TaskStatus taskStatus = getStatus(id);
+        taskStatusRepository.delete(taskStatus);
     }
 }

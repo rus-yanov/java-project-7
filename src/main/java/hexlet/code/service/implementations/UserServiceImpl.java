@@ -4,7 +4,7 @@ import hexlet.code.dto.UserDto;
 import hexlet.code.model.User;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.service.UserService;
-import hexlet.code.config.security.SecurityConfig;
+
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,10 +14,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
+import static hexlet.code.config.security.SecurityConfig.DEFAULT_AUTHORITIES;
+
 
 @Service
-@Transactional
 @AllArgsConstructor
+@Transactional
 public class UserServiceImpl implements UserService, UserDetailsService {
 
     private final UserRepository userRepository;
@@ -25,13 +29,26 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public User createNewUser(final UserDto userDto) {
+    public User getUserById(long id) {
+        return userRepository.findById(id)
+                .orElseThrow();
+    }
+
+    @Override
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    @Override
+    public User createUser(UserDto userDto) {
         final User user = new User();
         user.setEmail(userDto.getEmail());
         user.setFirstName(userDto.getFirstName());
         user.setLastName(userDto.getLastName());
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        return userRepository.save(user);
+        userRepository.save(user);
+
+        return user;
     }
 
     @Override
@@ -45,6 +62,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    public void deleteUser(long id) {
+        final User user = userRepository.findById(id).orElseThrow();
+        userRepository.delete(user);
+    }
+
+
+    @Override
     public String getCurrentUserId() {
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }
@@ -54,19 +78,20 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return userRepository.findByEmail(getCurrentUserId()).get();
     }
 
+
     @Override
     public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
         return userRepository.findByEmail(username)
                 .map(this::buildSpringUser)
-                .orElseThrow(() -> new UsernameNotFoundException(
-                        "Not found user with 'email': " + username));
+                .orElseThrow(() -> new UsernameNotFoundException("Not found user with 'email': " + username));
     }
 
     private UserDetails buildSpringUser(final User user) {
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPassword(),
-                SecurityConfig.DEFAULT_AUTHORITIES
+                DEFAULT_AUTHORITIES
         );
     }
+
 }
