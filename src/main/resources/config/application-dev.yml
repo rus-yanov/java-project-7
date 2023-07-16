@@ -8,17 +8,13 @@ spring:
     username: sa
     password:
 
-springdoc:
-  swagger-ui:
-    path: /swagger.html
-
   jpa:
     show-sql: true
 
   h2:
     console:
       enabled: true
-      path: /h2console/
+      path: /h2-console/
       settings:
         web-allow-others: true
 
@@ -26,3 +22,7 @@ springdoc:
     level:
       root: INFO
       web: DEBUG
+
+#springdoc:
+#  swagger-ui:
+#    path: /swagger.html

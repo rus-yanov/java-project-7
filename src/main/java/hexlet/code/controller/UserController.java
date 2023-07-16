@@ -13,12 +13,14 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
 import jakarta.validation.Valid;
 
 import static hexlet.code.controller.UserController.USER_CONTROLLER_PATH;
+import static org.springframework.http.HttpStatus.CREATED;
 
 @AllArgsConstructor
 @RestController
@@ -34,6 +36,7 @@ public class UserController {
     private final UserRepository userRepository;
 
     @PostMapping
+    @ResponseStatus(CREATED)
     public User createUser(@Valid @RequestBody UserDto userDto) {
         return userService.createUser(userDto);
     }

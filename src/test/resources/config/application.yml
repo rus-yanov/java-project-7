@@ -1,17 +1,8 @@
-base-url: /api
+base-url: ""
 
 spring:
   application:
     name: taskManager
-
-    jpa:
-      datasource:
-        url: jdbc:h2:./taskManager
-        username: sa
-        password:
-      show-sql: true
-      hibernate:
-        ddl-auto: update
 
   liquibase:
     enabled: true

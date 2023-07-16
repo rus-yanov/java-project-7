@@ -1,4 +1,4 @@
-package hexlet.code.service.implementations;
+package hexlet.code.service.implementation;
 
 import hexlet.code.dto.TaskStatusDto;
 import hexlet.code.model.TaskStatus;

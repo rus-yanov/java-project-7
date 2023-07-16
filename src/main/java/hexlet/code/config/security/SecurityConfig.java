@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -31,7 +32,7 @@ import static org.springframework.http.HttpMethod.POST;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity
 public class SecurityConfig {
 
     public static final String LOGIN = "/login";
@@ -86,11 +87,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/token/**").permitAll()
-                        .anyRequest().authenticated()
-                )
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth.
+                        requestMatchers(publicUrls).permitAll()
+                        .anyRequest().authenticated())
                 .addFilter(new JWTAuthenticationFilter(
                         authenticationManager(http.getSharedObject(AuthenticationConfiguration.class)),
                         loginRequest,
@@ -100,9 +100,9 @@ public class SecurityConfig {
                         new JWTAuthorizationFilter(publicUrls, jwtHelper),
                         UsernamePasswordAuthenticationFilter.class
                 )
-                .formLogin(login -> login.disable())
-                .sessionManagement(management -> management.disable())
-                .logout(logout -> logout.disable())
+                .formLogin(AbstractHttpConfigurer::disable)
+                .sessionManagement(AbstractHttpConfigurer::disable)
+                .logout(AbstractHttpConfigurer::disable)
                 .build();
     }
 }

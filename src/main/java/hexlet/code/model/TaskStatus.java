@@ -17,7 +17,7 @@ import jakarta.validation.constraints.Size;
 
 import java.util.Date;
 
-import static jakarta.persistence.GenerationType.AUTO;
+import static jakarta.persistence.GenerationType.IDENTITY;
 import static jakarta.persistence.TemporalType.TIMESTAMP;
 
 @Entity
@@ -28,7 +28,7 @@ import static jakarta.persistence.TemporalType.TIMESTAMP;
 @AllArgsConstructor
 public class TaskStatus {
     @Id
-    @GeneratedValue(strategy = AUTO)
+    @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
     @NotBlank

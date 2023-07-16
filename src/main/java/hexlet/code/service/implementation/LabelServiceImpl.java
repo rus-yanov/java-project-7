@@ -1,4 +1,4 @@
-package hexlet.code.service.implementations;
+package hexlet.code.service.implementation;
 
 import hexlet.code.dto.LabelDto;
 import hexlet.code.model.Label;
