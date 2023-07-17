@@ -37,7 +37,7 @@ dependencies {
 			'org.liquibase:liquibase-core',
 			'io.jsonwebtoken:jjwt:0.9.1',
 			'org.springdoc:springdoc-openapi-ui:1.7.0',
-			'com.rollbar:rollbar-spring-boot-webmvc:1.10.0'
+			'com.rollbar:rollbar-spring-boot3-webmvc:1.10.0'
 	)
 
 	liquibaseRuntime(
