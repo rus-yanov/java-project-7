@@ -2,10 +2,6 @@ server:
   error:
     include-stacktrace: never
 
-springdoc:
-  swagger-ui:
-    path: /swagger-ui.html
-
 spring:
   devtools:
     restart:

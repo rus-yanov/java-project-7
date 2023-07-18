@@ -40,9 +40,9 @@ public class TestUtils {
 
     private final UserDto defaultUser = new UserDto(
             TEST_USERNAME_1,
-            "Ivan",
-            "Petrov",
-            "password");
+            "Foo",
+            "Bar",
+            "0987");
 
     private final TaskStatusDto defaultStatus = new TaskStatusDto("Default Status");
 

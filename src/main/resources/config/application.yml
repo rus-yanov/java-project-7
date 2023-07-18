@@ -1,6 +1,3 @@
-#  profiles:
-#  active: "prod"
-
 server:
   port: ${PORT:8090}
 
@@ -17,13 +14,11 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create-drop
+    open-in-view: false
 
   mvc:
     hiddenmethod:
       filter:
         enabled: true
-
-  profiles:
-    active: prod
 
 rollbar_token: 931a028efa194f95b7f9a91139bbd51b
