@@ -4,6 +4,8 @@ WORKDIR /app
 
 COPY ./ .
 
+SHELL ["/bin/bash", "-c"]
+
 RUN gradle installDist
 
 CMD build/install/app/bin/app
