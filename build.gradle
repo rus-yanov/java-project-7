@@ -44,7 +44,8 @@ dependencies {
 			sourceSets.main.output,
 			'org.liquibase:liquibase-core',
 			'org.liquibase.ext:liquibase-hibernate6:4.21.1',
-			'org.springframework.boot:spring-boot-starter-data-jpa'
+			'org.springframework.boot:spring-boot-starter-data-jpa',
+			'com.h2database:h2'
 	)
 
 	runtimeOnly(

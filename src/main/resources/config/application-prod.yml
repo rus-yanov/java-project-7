@@ -16,7 +16,7 @@ spring:
   datasource:
     username: ${JDBC_DATABASE_USERNAME}
     password: ${JDBC_DATABASE_PASSWORD}
-    url: ${JDBC_DATABASE_URL}
+    url: jdbc:postgresql://${HOST}:${PORT}/${NAME}
 
   jpa:
     show-sql: false
