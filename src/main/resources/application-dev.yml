@@ -8,7 +8,7 @@ springdoc:
 
 spring:
   datasource:
-    username: "sa"
+    username: ""
     password: ""
     url: jdbc:h2:./taskManager
 

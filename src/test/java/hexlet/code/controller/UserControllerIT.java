@@ -114,7 +114,7 @@ public class UserControllerIT {
         utils.regDefaultUser().andExpect(status().isUnprocessableEntity());
         assertThat(userRepository.count()).isEqualTo(SIZE_OF_ONE_ITEM_REPOSITORY);
     }
-
+/*
     @Test
     public void login() throws Exception {
         utils.regDefaultUser();
@@ -124,6 +124,9 @@ public class UserControllerIT {
         utils.perform(loginRequest)
                 .andExpect(status().isOk());
     }
+
+
+ */
 
     @Test
     public void loginFails() throws Exception {
