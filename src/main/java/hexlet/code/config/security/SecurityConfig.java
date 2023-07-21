@@ -32,7 +32,7 @@ import static org.springframework.http.HttpMethod.POST;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
     public static final String LOGIN = "/login";
@@ -88,9 +88,6 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-                .headers(headers -> headers
-                        .frameOptions(frameOptions -> frameOptions
-                                .sameOrigin()))
                 .authorizeHttpRequests(auth -> auth.
                         requestMatchers(publicUrls).permitAll()
                         .anyRequest().authenticated())
@@ -106,6 +103,9 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .sessionManagement(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
+                .headers(headers -> headers
+                        .frameOptions(frameOptions -> frameOptions
+                                .sameOrigin()))
                 .build();
     }
 }

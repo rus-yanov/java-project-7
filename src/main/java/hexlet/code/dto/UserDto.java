@@ -1,17 +1,23 @@
 package hexlet.code.dto;
 
-import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+@Getter
+@Setter
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDto {
+
+//    private long id;
 
     @NotBlank
     @Email

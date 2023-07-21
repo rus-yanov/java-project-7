@@ -15,6 +15,7 @@ import static hexlet.code.config.security.SecurityConfig.DEFAULT_AUTHORITIES;
 @Service
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
+
     private final UserRepository userRepository;
 
     @Override
