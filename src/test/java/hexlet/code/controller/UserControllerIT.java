@@ -114,19 +114,16 @@ public class UserControllerIT {
         utils.regDefaultUser().andExpect(status().isUnprocessableEntity());
         assertThat(userRepository.count()).isEqualTo(SIZE_OF_ONE_ITEM_REPOSITORY);
     }
-/*
+
     @Test
     public void login() throws Exception {
         utils.regDefaultUser();
-        final LoginDto rightCredentials = new LoginDto(TEST_USERNAME_1, "password");
+        final LoginDto rightCredentials = new LoginDto(TEST_USERNAME_1, "0987");
 
         final var loginRequest = post(LOGIN).content(asJson(rightCredentials)).contentType(APPLICATION_JSON);
         utils.perform(loginRequest)
                 .andExpect(status().isOk());
     }
-
-
- */
 
     @Test
     public void loginFails() throws Exception {

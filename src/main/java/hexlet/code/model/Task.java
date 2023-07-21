@@ -21,7 +21,7 @@ import jakarta.validation.constraints.Size;
 import java.util.Date;
 import java.util.Set;
 
-import static jakarta.persistence.GenerationType.IDENTITY;
+import static jakarta.persistence.GenerationType.AUTO;
 import static jakarta.persistence.TemporalType.TIMESTAMP;
 import static org.hibernate.annotations.FetchMode.JOIN;
 
@@ -34,7 +34,7 @@ import static org.hibernate.annotations.FetchMode.JOIN;
 @Builder
 public class Task {
     @Id
-    @GeneratedValue(strategy = IDENTITY)
+    @GeneratedValue(strategy = AUTO)
     private Long id;
 
     @ManyToOne

@@ -116,7 +116,7 @@ liquibase {
 			changelogFile 'src/main/resources/db/changelog/db.changelog-master.yaml'
 			// Указывем источник, с которым будут сравниваться изменения
 			// Это база данных, изначально она пустая
-			url 'jdbc:h2:./taskManager'
+			url 'jdbc:h2:./taskManagerDB'
 			// Сравниваем с моделями, задавая пакет
 			referenceUrl 'hibernate:spring:hexlet.code.model' +
 					// Указываем диалект

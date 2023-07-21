@@ -10,7 +10,8 @@ spring:
   datasource:
     username: ""
     password: ""
-    url: jdbc:h2:./taskManager
+    url: jdbc:h2:./taskManagerDB
+    driver-class-name: org.h2.Driver
 
   jpa:
     show-sql: true

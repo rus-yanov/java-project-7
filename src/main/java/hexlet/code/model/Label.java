@@ -19,7 +19,7 @@ import java.util.Date;
 import java.util.Set;
 
 import static jakarta.persistence.TemporalType.TIMESTAMP;
-import static jakarta.persistence.GenerationType.IDENTITY;
+import static jakarta.persistence.GenerationType.AUTO;
 
 @Entity
 @AllArgsConstructor
@@ -29,7 +29,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Setter
 public class Label {
     @Id
-    @GeneratedValue(strategy = IDENTITY)
+    @GeneratedValue(strategy = AUTO)
     private Long id;
 
     @NotBlank
