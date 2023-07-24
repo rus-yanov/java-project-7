@@ -10,8 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @Configuration
-@EnableWebMvc
-@ComponentScan({"hexlet.code"})
+@ComponentScan({"hexlet.code",
+        "com.rollbar.spring"})
 public class RollbarConfig {
 
     // Добавляем токен через переменные окружения
