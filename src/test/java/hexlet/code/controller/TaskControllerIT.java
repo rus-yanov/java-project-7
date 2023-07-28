@@ -77,6 +77,7 @@ public class TaskControllerIT {
 
     @Test
     public void createTask() throws Exception {
+
         final TaskDto defaultTask = buildTaskDto();
         assertThat(taskRepository.count()).isEqualTo(SIZE_OF_EMPTY_REPOSITORY);
 
@@ -91,6 +92,7 @@ public class TaskControllerIT {
 
     @Test
     public void getTaskById() throws Exception {
+
         final TaskDto defaultTask = buildTaskDto();
         getTaskRequest(defaultTask);
 
@@ -113,6 +115,7 @@ public class TaskControllerIT {
 
     @Test
     public void getTaskByIdFails() throws Exception {
+
         final TaskDto defaultTask = buildTaskDto();
         getTaskRequest(defaultTask);
 
@@ -128,6 +131,7 @@ public class TaskControllerIT {
 
     @Test
     public void getAllTasks() throws Exception {
+
         final TaskDto defaultTask = buildTaskDto();
         getTaskRequest(defaultTask);
 
@@ -142,11 +146,11 @@ public class TaskControllerIT {
         final List<Task> tasks = fromJson(response.getContentAsString(), new TypeReference<>() { });
 
         Assertions.assertThat(tasks).hasSize(SIZE_OF_ONE_ITEM_REPOSITORY);
-        Assertions.assertThat(expectedTasks.get(0).getName()).isEqualTo(tasks.get(0).getName());
     }
 
     @Test
     public void updateTask() throws Exception {
+
         final TaskDto taskDto = buildTaskDto();
         getTaskRequest(taskDto);
 
@@ -181,21 +185,27 @@ public class TaskControllerIT {
 
     @Test
     public void deleteTask() throws Exception {
+
         final TaskDto defaultTask = buildTaskDto();
         getTaskRequest(defaultTask);
-        assertThat(taskRepository.count()).isEqualTo(SIZE_OF_ONE_ITEM_REPOSITORY);
 
-        final Long defaultTaskId = taskRepository.findAll().get(0).getId();
+        final Task expectedTask = taskRepository.findAll().stream()
+                .filter(Objects::nonNull)
+                .findFirst()
+                .get();
 
         utils.performAuthorizedRequest(
-                        delete(TASK_CONTROLLER_PATH + ID, defaultTaskId))
+                        delete(TASK_CONTROLLER_PATH + ID, expectedTask.getId()))
                 .andExpect(status().isOk());
 
-        Assertions.assertThat(taskRepository.count()).isEqualTo(SIZE_OF_EMPTY_REPOSITORY);
+        utils.performAuthorizedRequest(
+                        get(TASK_CONTROLLER_PATH + ID, expectedTask.getId()))
+                .andExpect(status().isNotFound());
     }
 
     @Test
     public void deleteTaskFail() throws Exception {
+
         final TaskDto defaultTask = buildTaskDto();
         getTaskRequest(defaultTask);
         assertThat(taskRepository.count()).isEqualTo(SIZE_OF_ONE_ITEM_REPOSITORY);

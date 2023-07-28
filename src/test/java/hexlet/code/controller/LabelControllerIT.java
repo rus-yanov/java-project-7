@@ -140,7 +140,6 @@ public class LabelControllerIT {
     @Test
     public void deleteLabel() throws Exception {
         utils.regDefaultLabel();
-        assertThat(labelRepository.count()).isEqualTo(SIZE_OF_ONE_ITEM_REPOSITORY);
 
         final Long defaultLabelId = labelRepository.findAll().get(0).getId();
 
@@ -148,6 +147,9 @@ public class LabelControllerIT {
                         delete(LABEL_CONTROLLER_PATH + ID, defaultLabelId))
                 .andExpect(status().isOk());
 
-        Assertions.assertThat(labelRepository.count()).isEqualTo(SIZE_OF_EMPTY_REPOSITORY);
+        utils.performAuthorizedRequest(
+                        get(LABEL_CONTROLLER_PATH + ID, defaultLabelId))
+                .andExpect(status().isNotFound());
+
     }
 }

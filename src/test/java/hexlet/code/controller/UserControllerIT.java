@@ -71,8 +71,7 @@ public class UserControllerIT {
         final User expectedUser = userRepository.findAll().get(0);
 
         final var response = utils.performAuthorizedRequest(
-                        get(USER_CONTROLLER_PATH + ID, expectedUser.getId())
-                )
+                        get(USER_CONTROLLER_PATH + ID, expectedUser.getId()))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse();
@@ -165,10 +164,12 @@ public class UserControllerIT {
 
         utils.performAuthorizedRequest(
                         delete(USER_CONTROLLER_PATH + ID, userId))
-                .andExpect(status().isOk()
-                );
+                .andExpect(status().isOk());
 
-        assertThat(userRepository.count()).isEqualTo(SIZE_OF_EMPTY_REPOSITORY);
+        utils.performAuthorizedRequest(
+                        get(USER_CONTROLLER_PATH + ID, userId))
+                .andExpect(status().isNotFound());
+
     }
 
     @Test
@@ -187,8 +188,7 @@ public class UserControllerIT {
 
         utils.performAuthorizedRequest(
                         delete(USER_CONTROLLER_PATH + ID, defaultUserId))
-                .andExpect(status().isOk()
-                );
+                .andExpect(status().isOk());
 
         assertThat(userRepository.count()).isEqualTo(SIZE_OF_ONE_ITEM_REPOSITORY);
 

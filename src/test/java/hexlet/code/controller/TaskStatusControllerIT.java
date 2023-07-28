@@ -7,6 +7,7 @@ import hexlet.code.model.TaskStatus;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.utils.TestUtils;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,11 @@ public class TaskStatusControllerIT {
     @Autowired
     private TestUtils utils;
 
+    @BeforeEach
+    public void before() throws Exception {
+        utils.regDefaultUser();
+    }
+
     @AfterEach
     public void clear() {
         utils.tearDown();
@@ -51,7 +57,7 @@ public class TaskStatusControllerIT {
 
     @Test
     public void createStatus() throws Exception {
-        utils.regDefaultUser();
+
         assertThat(taskStatusRepository.count()).isEqualTo(SIZE_OF_EMPTY_REPOSITORY);
 
         final TaskStatusDto statusDto = new TaskStatusDto("Some status");
@@ -72,7 +78,7 @@ public class TaskStatusControllerIT {
 
     @Test
     public void getStatusById() throws Exception {
-        utils.regDefaultUser();
+
         utils.regDefaultStatus();
         final TaskStatus expectedStatus = taskStatusRepository.findAll().get(0);
 
@@ -91,7 +97,7 @@ public class TaskStatusControllerIT {
 
     @Test
     public void getStatusByIdFails() throws Exception {
-        utils.regDefaultUser();
+
         utils.regDefaultStatus();
         final TaskStatus expectedStatus = taskStatusRepository.findAll().get(0);
 
@@ -102,7 +108,7 @@ public class TaskStatusControllerIT {
 
     @Test
     public void getAllStatuses() throws Exception {
-        utils.regDefaultUser();
+
         utils.regDefaultStatus();
         final var response = utils.performAuthorizedRequest(
                         get(TASK_STATUS_CONTROLLER_PATH))
@@ -116,7 +122,7 @@ public class TaskStatusControllerIT {
 
     @Test
     public void updateStatus() throws Exception {
-        utils.regDefaultUser();
+
         final var response = utils.regDefaultStatus()
                 .andExpect(status().isCreated())
                 .andReturn().getResponse();
@@ -132,12 +138,22 @@ public class TaskStatusControllerIT {
                                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        assertThat(taskStatusRepository.existsById(statusId)).isTrue();
+        final var anotherResponse = utils.performAuthorizedRequest(
+                        get(TASK_STATUS_CONTROLLER_PATH + ID, statusId))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse();
+
+        final TaskStatus expectedStatus = fromJson(anotherResponse.getContentAsString(), new TypeReference<>() { });
+
+        assertThat(statusId).isEqualTo(expectedStatus.getId());
+        assertThat(newStatus.getName()).isEqualTo(expectedStatus.getName());
+
     }
 
     @Test
     public void deleteStatus() throws Exception {
-        utils.regDefaultUser();
+
         var response = utils.regDefaultStatus()
                 .andExpect(status().isCreated())
                 .andReturn().getResponse();
@@ -149,6 +165,9 @@ public class TaskStatusControllerIT {
                         delete(TASK_STATUS_CONTROLLER_PATH + ID, statusId))
                 .andExpect(status().isOk());
 
-        assertThat(taskStatusRepository.count()).isEqualTo(SIZE_OF_EMPTY_REPOSITORY);
+        utils.performAuthorizedRequest(
+                        get(TASK_STATUS_CONTROLLER_PATH + ID, statusId))
+                .andExpect(status().isNotFound());
+
     }
 }
