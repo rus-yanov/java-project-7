@@ -11,7 +11,6 @@ import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.utils.TestUtils;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,6 +36,7 @@ import static hexlet.code.utils.TestUtils.SIZE_OF_ONE_ITEM_REPOSITORY;
 import static hexlet.code.utils.TestUtils.asJson;
 import static hexlet.code.utils.TestUtils.fromJson;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -87,7 +87,7 @@ public class TaskControllerIT {
                                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
-        Assertions.assertThat(taskRepository.count()).isEqualTo(SIZE_OF_ONE_ITEM_REPOSITORY);
+        assertThat(taskRepository.count()).isEqualTo(SIZE_OF_ONE_ITEM_REPOSITORY);
     }
 
     @Test
@@ -109,8 +109,8 @@ public class TaskControllerIT {
 
         final Task task = fromJson(response.getContentAsString(), new TypeReference<>() { });
 
-        Assertions.assertThat(expectedTask.getId()).isEqualTo(task.getId());
-        Assertions.assertThat(expectedTask.getName()).isEqualTo(task.getName());
+        assertThat(expectedTask.getId()).isEqualTo(task.getId());
+        assertThat(expectedTask.getName()).isEqualTo(task.getName());
     }
 
     @Test
@@ -134,8 +134,7 @@ public class TaskControllerIT {
 
         final TaskDto defaultTask = buildTaskDto();
         getTaskRequest(defaultTask);
-
-        final List<Task> expectedTasks = taskRepository.findAll();
+        final String defaultName = taskRepository.findAll().get(0).getName();
 
         final var response = utils.performAuthorizedRequest(
                         get(TASK_CONTROLLER_PATH))
@@ -144,8 +143,9 @@ public class TaskControllerIT {
                 .getResponse();
 
         final List<Task> tasks = fromJson(response.getContentAsString(), new TypeReference<>() { });
+        final String expectedName = tasks.get(0).getName();
 
-        Assertions.assertThat(tasks).hasSize(SIZE_OF_ONE_ITEM_REPOSITORY);
+        assertThat(expectedName).isEqualTo(defaultName);
     }
 
     @Test
@@ -165,7 +165,6 @@ public class TaskControllerIT {
         taskDto.setName("Updated task title");
         taskDto.setDescription("Updated task description");
 
-
         var response = utils.performAuthorizedRequest(
                         put(TASK_CONTROLLER_PATH + ID, taskId)
                                 .content(asJson(taskDto))
@@ -175,10 +174,11 @@ public class TaskControllerIT {
                 .getResponse();
 
         final Task updatedTask = fromJson(response.getContentAsString(), new TypeReference<>() { });
+        final String updatedTaskName = updatedTask.getName();
 
         assertThat(taskRepository.existsById(taskId)).isTrue();
         assertThat(taskRepository.findById(taskId).get().getName()).isNotEqualTo(oldTaskName);
-        assertThat(taskRepository.findById(taskId).get().getName()).isEqualTo(updatedTask.getName());
+        assertThat(taskRepository.findById(taskId).get().getName()).isEqualTo(updatedTaskName);
         assertThat(taskRepository.findById(taskId).get().getDescription()).isEqualTo(updatedTask.getDescription());
 
     }
@@ -189,18 +189,18 @@ public class TaskControllerIT {
         final TaskDto defaultTask = buildTaskDto();
         getTaskRequest(defaultTask);
 
-        final Task expectedTask = taskRepository.findAll().stream()
+        final Task task = taskRepository.findAll().stream()
                 .filter(Objects::nonNull)
                 .findFirst()
                 .get();
 
-        utils.performAuthorizedRequest(
-                        delete(TASK_CONTROLLER_PATH + ID, expectedTask.getId()))
-                .andExpect(status().isOk());
+        final Long taskId = task.getId();
 
         utils.performAuthorizedRequest(
-                        get(TASK_CONTROLLER_PATH + ID, expectedTask.getId()))
-                .andExpect(status().isNotFound());
+                        delete(TASK_CONTROLLER_PATH + ID, taskId))
+                .andExpect(status().isOk());
+
+        assertFalse(taskRepository.existsById(taskId));
     }
 
     @Test

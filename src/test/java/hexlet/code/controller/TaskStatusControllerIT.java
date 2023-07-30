@@ -25,6 +25,7 @@ import static hexlet.code.utils.TestUtils.SIZE_OF_ONE_ITEM_REPOSITORY;
 import static hexlet.code.utils.TestUtils.asJson;
 import static hexlet.code.utils.TestUtils.fromJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -69,8 +70,7 @@ public class TaskStatusControllerIT {
                 .andExpect(status().isCreated())
                 .andReturn().getResponse();
 
-        final TaskStatus status = TestUtils.fromJson(response.getContentAsString(), new TypeReference<>() {
-        });
+        final TaskStatus status = TestUtils.fromJson(response.getContentAsString(), new TypeReference<>() { });
 
         assertThat(status.getName()).isEqualTo(statusDto.getName());
         assertThat(taskStatusRepository.count()).isEqualTo(SIZE_OF_ONE_ITEM_REPOSITORY);
@@ -110,6 +110,8 @@ public class TaskStatusControllerIT {
     public void getAllStatuses() throws Exception {
 
         utils.regDefaultStatus();
+        final String defaultName = taskStatusRepository.findAll().get(0).getName();
+
         final var response = utils.performAuthorizedRequest(
                         get(TASK_STATUS_CONTROLLER_PATH))
                 .andExpect(status().isOk())
@@ -117,37 +119,38 @@ public class TaskStatusControllerIT {
                 .getResponse();
 
         final List<TaskStatus> taskStatuses = fromJson(response.getContentAsString(), new TypeReference<>() { });
+        final String expectedName = taskStatuses.get(0).getName();
+
         assertThat(taskStatuses).hasSize(SIZE_OF_ONE_ITEM_REPOSITORY);
+        assertThat(expectedName).isEqualTo(defaultName);
+
     }
 
     @Test
     public void updateStatus() throws Exception {
 
-        final var response = utils.regDefaultStatus()
-                .andExpect(status().isCreated())
-                .andReturn().getResponse();
+        utils.regDefaultStatus();
 
-        final TaskStatus oldStatus = fromJson(response.getContentAsString(), new TypeReference<>() { });
-        final Long statusId = oldStatus.getId();
+        final TaskStatus defaultStatus = taskStatusRepository.findAll().get(0);
+        final Long statusId = defaultStatus.getId();
+        final String oldStatusName = defaultStatus.getName();
 
         final TaskStatusDto newStatus = new TaskStatusDto("Another Status");
 
-        utils.performAuthorizedRequest(
+        final var response = utils.performAuthorizedRequest(
                         put(TASK_STATUS_CONTROLLER_PATH + ID, statusId)
                                 .content(asJson(newStatus))
                                 .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk());
-
-        final var anotherResponse = utils.performAuthorizedRequest(
-                        get(TASK_STATUS_CONTROLLER_PATH + ID, statusId))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse();
 
-        final TaskStatus expectedStatus = fromJson(anotherResponse.getContentAsString(), new TypeReference<>() { });
+        final TaskStatus updatedStatus = fromJson(response.getContentAsString(), new TypeReference<>() { });
+        final String updatedStatusName = updatedStatus.getName();
 
-        assertThat(statusId).isEqualTo(expectedStatus.getId());
-        assertThat(newStatus.getName()).isEqualTo(expectedStatus.getName());
+        assertThat(taskStatusRepository.existsById(statusId)).isTrue();
+        assertThat(taskStatusRepository.findById(statusId).get().getName()).isNotEqualTo(oldStatusName);
+        assertThat(taskStatusRepository.findById(statusId).get().getName()).isEqualTo(updatedStatusName);
 
     }
 
@@ -165,9 +168,7 @@ public class TaskStatusControllerIT {
                         delete(TASK_STATUS_CONTROLLER_PATH + ID, statusId))
                 .andExpect(status().isOk());
 
-        utils.performAuthorizedRequest(
-                        get(TASK_STATUS_CONTROLLER_PATH + ID, statusId))
-                .andExpect(status().isNotFound());
+        assertFalse(taskStatusRepository.existsById(statusId));
 
     }
 }

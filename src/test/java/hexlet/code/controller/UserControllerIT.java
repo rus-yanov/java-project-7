@@ -26,10 +26,11 @@ import static hexlet.code.utils.TestUtils.SIZE_OF_EMPTY_REPOSITORY;
 import static hexlet.code.utils.TestUtils.SIZE_OF_ONE_ITEM_REPOSITORY;
 import static hexlet.code.utils.TestUtils.asJson;
 import static hexlet.code.utils.TestUtils.fromJson;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -166,9 +167,7 @@ public class UserControllerIT {
                         delete(USER_CONTROLLER_PATH + ID, userId))
                 .andExpect(status().isOk());
 
-        utils.performAuthorizedRequest(
-                        get(USER_CONTROLLER_PATH + ID, userId))
-                .andExpect(status().isNotFound());
+        assertFalse(userRepository.existsById(userId));
 
     }
 

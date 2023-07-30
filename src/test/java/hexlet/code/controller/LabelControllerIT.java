@@ -5,7 +5,6 @@ import hexlet.code.model.Label;
 import hexlet.code.repository.LabelRepository;
 import hexlet.code.config.SpringConfigForIT;
 import hexlet.code.utils.TestUtils;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +27,7 @@ import static hexlet.code.utils.TestUtils.SIZE_OF_ONE_ITEM_REPOSITORY;
 import static hexlet.code.utils.TestUtils.asJson;
 import static hexlet.code.utils.TestUtils.fromJson;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -73,6 +73,7 @@ public class LabelControllerIT {
                 .andReturn().getResponse();
 
         final Label label = TestUtils.fromJson(response.getContentAsString(), new TypeReference<>() { });
+
         assertThat(label.getName()).isEqualTo(defaultLabelDto.getName());
         assertThat(labelRepository.count()).isEqualTo(SIZE_OF_ONE_ITEM_REPOSITORY);
     }
@@ -90,8 +91,8 @@ public class LabelControllerIT {
 
         final Label label = fromJson(response.getContentAsString(), new TypeReference<>() { });
 
-        Assertions.assertThat(label.getId()).isEqualTo(expectedLabel.getId());
-        Assertions.assertThat(label.getName()).isEqualTo(expectedLabel.getName());
+        assertThat(label.getId()).isEqualTo(expectedLabel.getId());
+        assertThat(label.getName()).isEqualTo(expectedLabel.getName());
     }
 
     @Test
@@ -113,28 +114,35 @@ public class LabelControllerIT {
 
         final List<Label> labels = fromJson(response.getContentAsString(), new TypeReference<>() { });
 
-        Assertions.assertThat(labels.get(0).getName()).isEqualTo("Default label");
-        Assertions.assertThat(labels.get(1).getName()).isEqualTo("New label");
+        assertThat(labels.get(0).getName()).isEqualTo("Default label");
+        assertThat(labels.get(1).getName()).isEqualTo("New label");
     }
 
     @Test
     public void updateLabel() throws Exception {
         utils.regDefaultLabel();
-        final LabelDto updatedLabel = new LabelDto("Updated label");
 
-        final Long labelId = labelRepository.findAll().get(0).getId();
+        final Label defaultLabel = labelRepository.findAll().get(0);
+        final Long labelId = defaultLabel.getId();
+        final String oldLabelName = defaultLabel.getName();
+
+        final LabelDto newLabel = new LabelDto("Updated label");
 
         final var response = utils.performAuthorizedRequest(
                         put(LABEL_CONTROLLER_PATH + ID, labelId)
-                                .content(asJson(updatedLabel))
+                                .content(asJson(newLabel))
                                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse();
 
-        final Label label = fromJson(response.getContentAsString(), new TypeReference<>() { });
+        final Label updatedLabel = fromJson(response.getContentAsString(), new TypeReference<>() { });
+        final String updatedLabelName = updatedLabel.getName();
 
-        Assertions.assertThat(label.getName()).isEqualTo(updatedLabel.getName());
+        assertThat(labelRepository.existsById(labelId)).isTrue();
+        assertThat(labelRepository.findById(labelId).get().getName()).isNotEqualTo(oldLabelName);
+        assertThat(labelRepository.findById(labelId).get().getName()).isEqualTo(updatedLabelName);
+
     }
 
     @Test
@@ -147,9 +155,7 @@ public class LabelControllerIT {
                         delete(LABEL_CONTROLLER_PATH + ID, defaultLabelId))
                 .andExpect(status().isOk());
 
-        utils.performAuthorizedRequest(
-                        get(LABEL_CONTROLLER_PATH + ID, defaultLabelId))
-                .andExpect(status().isNotFound());
+        assertFalse(labelRepository.existsById(defaultLabelId));
 
     }
 }
