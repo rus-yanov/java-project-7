@@ -6,6 +6,7 @@ import hexlet.code.dto.TaskStatusDto;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.utils.TestUtils;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -71,9 +72,13 @@ public class TaskStatusControllerIT {
                 .andReturn().getResponse();
 
         final TaskStatus status = TestUtils.fromJson(response.getContentAsString(), new TypeReference<>() { });
+        final List<TaskStatus> taskStatuses = fromJson(response.getContentAsString(), new TypeReference<>() { });
+        final List<TaskStatus> expected = taskStatusRepository.findAll();
 
+        assertThat(taskStatuses).containsAll(expected);
         assertThat(status.getName()).isEqualTo(statusDto.getName());
         assertThat(taskStatusRepository.count()).isEqualTo(SIZE_OF_ONE_ITEM_REPOSITORY);
+
     }
 
     @Test
@@ -119,10 +124,9 @@ public class TaskStatusControllerIT {
                 .getResponse();
 
         final List<TaskStatus> taskStatuses = fromJson(response.getContentAsString(), new TypeReference<>() { });
-        final String expectedName = taskStatuses.get(0).getName();
+        final List<TaskStatus> expected = taskStatusRepository.findAll();
 
-        assertThat(taskStatuses).hasSize(SIZE_OF_ONE_ITEM_REPOSITORY);
-        assertThat(expectedName).isEqualTo(defaultName);
+        AssertionsForClassTypes.assertThat(taskStatuses).containsAll(expected);
 
     }
 

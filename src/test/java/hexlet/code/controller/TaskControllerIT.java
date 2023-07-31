@@ -81,12 +81,17 @@ public class TaskControllerIT {
         final TaskDto defaultTask = buildTaskDto();
         assertThat(taskRepository.count()).isEqualTo(SIZE_OF_EMPTY_REPOSITORY);
 
-        utils.performAuthorizedRequest(
+        final var response = utils.performAuthorizedRequest(
                         post(TASK_CONTROLLER_PATH)
                                 .content(utils.asJson(defaultTask))
                                 .contentType(APPLICATION_JSON))
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated())
+                .andReturn().getResponse();
 
+        final List<Task> tasks = fromJson(response.getContentAsString(), new TypeReference<>() { });
+        final List<Task> expected = taskRepository.findAll();
+
+        assertThat(tasks).containsAll(expected);
         assertThat(taskRepository.count()).isEqualTo(SIZE_OF_ONE_ITEM_REPOSITORY);
     }
 
@@ -101,16 +106,18 @@ public class TaskControllerIT {
                 .findFirst()
                 .get();
 
+        final Long expectedTaskId = expectedTask.getId();
+
         final var response = utils.performAuthorizedRequest(
-                        get(TASK_CONTROLLER_PATH + ID, expectedTask.getId()))
+                        get(TASK_CONTROLLER_PATH + ID, expectedTaskId))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse();
 
         final Task task = fromJson(response.getContentAsString(), new TypeReference<>() { });
 
-        assertThat(expectedTask.getId()).isEqualTo(task.getId());
-        assertThat(expectedTask.getName()).isEqualTo(task.getName());
+        assertThat(expectedTaskId).isEqualTo(task.getId());
+        assertThat(expectedTaskId).isEqualTo(task.getName());
     }
 
     @Test
@@ -143,9 +150,9 @@ public class TaskControllerIT {
                 .getResponse();
 
         final List<Task> tasks = fromJson(response.getContentAsString(), new TypeReference<>() { });
-        final String expectedName = tasks.get(0).getName();
+        final List<Task> expected = taskRepository.findAll();
 
-        assertThat(expectedName).isEqualTo(defaultName);
+        assertThat(tasks).containsAll(expected);
     }
 
     @Test
