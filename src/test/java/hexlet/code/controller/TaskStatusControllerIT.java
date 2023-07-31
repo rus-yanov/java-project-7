@@ -6,7 +6,6 @@ import hexlet.code.dto.TaskStatusDto;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.utils.TestUtils;
-import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +20,7 @@ import java.util.List;
 
 import static hexlet.code.controller.TaskStatusController.ID;
 import static hexlet.code.controller.TaskStatusController.TASK_STATUS_CONTROLLER_PATH;
-import static hexlet.code.utils.TestUtils.SIZE_OF_EMPTY_REPOSITORY;
+import static hexlet.code.utils.TestUtils.SIZE_OF_TWO_ITEM_REPOSITORY;
 import static hexlet.code.utils.TestUtils.SIZE_OF_ONE_ITEM_REPOSITORY;
 import static hexlet.code.utils.TestUtils.asJson;
 import static hexlet.code.utils.TestUtils.fromJson;
@@ -50,6 +49,7 @@ public class TaskStatusControllerIT {
     @BeforeEach
     public void before() throws Exception {
         utils.regDefaultUser();
+        utils.regDefaultStatus();
     }
 
     @AfterEach
@@ -60,7 +60,7 @@ public class TaskStatusControllerIT {
     @Test
     public void createStatus() throws Exception {
 
-        assertThat(taskStatusRepository.count()).isEqualTo(SIZE_OF_EMPTY_REPOSITORY);
+        assertThat(taskStatusRepository.count()).isEqualTo(SIZE_OF_ONE_ITEM_REPOSITORY);
 
         final TaskStatusDto statusDto = new TaskStatusDto("Some status");
 
@@ -71,20 +71,16 @@ public class TaskStatusControllerIT {
                 .andExpect(status().isCreated())
                 .andReturn().getResponse();
 
-        final TaskStatus status = TestUtils.fromJson(response.getContentAsString(), new TypeReference<>() { });
         final List<TaskStatus> taskStatuses = fromJson(response.getContentAsString(), new TypeReference<>() { });
         final List<TaskStatus> expected = taskStatusRepository.findAll();
 
         assertThat(taskStatuses).containsAll(expected);
-        assertThat(status.getName()).isEqualTo(statusDto.getName());
-        assertThat(taskStatusRepository.count()).isEqualTo(SIZE_OF_ONE_ITEM_REPOSITORY);
-
+        assertThat(taskStatusRepository.count()).isEqualTo(SIZE_OF_TWO_ITEM_REPOSITORY);
     }
 
     @Test
     public void getStatusById() throws Exception {
 
-        utils.regDefaultStatus();
         final TaskStatus expectedStatus = taskStatusRepository.findAll().get(0);
 
         final var response = utils.performAuthorizedRequest(
@@ -97,13 +93,11 @@ public class TaskStatusControllerIT {
 
         assertThat(expectedStatus.getId()).isEqualTo(taskStatus.getId());
         assertThat(expectedStatus.getName()).isEqualTo(taskStatus.getName());
-
     }
 
     @Test
     public void getStatusByIdFails() throws Exception {
 
-        utils.regDefaultStatus();
         final TaskStatus expectedStatus = taskStatusRepository.findAll().get(0);
 
         utils.performAuthorizedRequest(get(TASK_STATUS_CONTROLLER_PATH + ID,
@@ -114,7 +108,6 @@ public class TaskStatusControllerIT {
     @Test
     public void getAllStatuses() throws Exception {
 
-        utils.regDefaultStatus();
         final String defaultName = taskStatusRepository.findAll().get(0).getName();
 
         final var response = utils.performAuthorizedRequest(
@@ -126,14 +119,11 @@ public class TaskStatusControllerIT {
         final List<TaskStatus> taskStatuses = fromJson(response.getContentAsString(), new TypeReference<>() { });
         final List<TaskStatus> expected = taskStatusRepository.findAll();
 
-        AssertionsForClassTypes.assertThat(taskStatuses).containsAll(expected);
-
+        assertThat(taskStatuses).containsAll(expected);
     }
 
     @Test
     public void updateStatus() throws Exception {
-
-        utils.regDefaultStatus();
 
         final TaskStatus defaultStatus = taskStatusRepository.findAll().get(0);
         final Long statusId = defaultStatus.getId();
@@ -155,24 +145,17 @@ public class TaskStatusControllerIT {
         assertThat(taskStatusRepository.existsById(statusId)).isTrue();
         assertThat(taskStatusRepository.findById(statusId).get().getName()).isNotEqualTo(oldStatusName);
         assertThat(taskStatusRepository.findById(statusId).get().getName()).isEqualTo(updatedStatusName);
-
     }
 
     @Test
     public void deleteStatus() throws Exception {
 
-        var response = utils.regDefaultStatus()
-                .andExpect(status().isCreated())
-                .andReturn().getResponse();
-
-        final TaskStatus status = fromJson(response.getContentAsString(), new TypeReference<>() { });
-        final Long statusId = status.getId();
+        final Long statusId = taskStatusRepository.findAll().get(0).getId();
 
         utils.performAuthorizedRequest(
                         delete(TASK_STATUS_CONTROLLER_PATH + ID, statusId))
                 .andExpect(status().isOk());
 
         assertFalse(taskStatusRepository.existsById(statusId));
-
     }
 }

@@ -7,7 +7,6 @@ import hexlet.code.repository.UserRepository;
 import hexlet.code.config.SpringConfigForIT;
 import hexlet.code.utils.TestUtils;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +22,7 @@ import static hexlet.code.config.SpringConfigForIT.TEST_PROFILE;
 import static hexlet.code.utils.TestUtils.LOGIN;
 import static hexlet.code.utils.TestUtils.TEST_USERNAME_1;
 import static hexlet.code.utils.TestUtils.TEST_USERNAME_2;
+import static hexlet.code.utils.TestUtils.SIZE_OF_EMPTY_REPOSITORY;
 import static hexlet.code.utils.TestUtils.SIZE_OF_ONE_ITEM_REPOSITORY;
 import static hexlet.code.utils.TestUtils.asJson;
 import static hexlet.code.utils.TestUtils.fromJson;
@@ -53,11 +53,6 @@ public class UserControllerIT {
     @Autowired
     private TestUtils utils;
 
-    @BeforeEach
-    public void before() throws Exception {
-        utils.regDefaultUser();
-    }
-
     @AfterEach
     public void clear() {
         utils.tearDown();
@@ -66,29 +61,22 @@ public class UserControllerIT {
     @Test
     public void registration() throws Exception {
 
-        assertThat(userRepository.count()).isEqualTo(SIZE_OF_ONE_ITEM_REPOSITORY);
+        assertThat(userRepository.count()).isEqualTo(SIZE_OF_EMPTY_REPOSITORY);
 
-        final UserDto newUserDto = new UserDto(
-                TEST_USERNAME_2,
-                "new name",
-                "new last name",
-                "new pwd");
-
-        final var response = utils.regNewInstance(USER_CONTROLLER_PATH, newUserDto)
+        final var response = utils.regDefaultUser()
                 .andExpect(status().isCreated())
-                .andReturn()
-                .getResponse();
+                .andReturn().getResponse();
 
         final List<User> users = fromJson(response.getContentAsString(), new TypeReference<>() { });
         final List<User> expected = userRepository.findAll();
 
         assertThat(users).containsAll(expected);
-        assertThat(userRepository.count()).isEqualTo(SIZE_OF_ONE_ITEM_REPOSITORY
-                + SIZE_OF_ONE_ITEM_REPOSITORY);
+        assertThat(userRepository.count()).isEqualTo(SIZE_OF_ONE_ITEM_REPOSITORY);
     }
 
     @Test
     public void getUserById() throws Exception {
+        utils.regDefaultUser();
 
         final User expectedUser = userRepository.findAll().get(0);
 
@@ -98,8 +86,8 @@ public class UserControllerIT {
                 .andReturn()
                 .getResponse();
 
-        final User user = fromJson(response.getContentAsString(), new TypeReference<>() { });
-
+        final User user = fromJson(response.getContentAsString(), new TypeReference<>() {
+        });
         assertThat(expectedUser.getId()).isEqualTo(user.getId());
         assertThat(expectedUser.getEmail()).isEqualTo(user.getEmail());
         assertThat(expectedUser.getFirstName()).isEqualTo(user.getFirstName());
@@ -108,7 +96,7 @@ public class UserControllerIT {
 
     @Test
     public void getUserByIdFails() throws Exception {
-
+        utils.regDefaultUser();
         final User expectedUser = userRepository.findAll().get(0);
         utils.performAuthorizedRequest(
                         get(USER_CONTROLLER_PATH + ID, expectedUser.getId() + 1))
@@ -117,7 +105,7 @@ public class UserControllerIT {
 
     @Test
     public void getAllUsers() throws Exception {
-
+        utils.regDefaultUser();
         final var response = utils.perform(get(USER_CONTROLLER_PATH))
                 .andExpect(status().isOk())
                 .andReturn()
@@ -132,14 +120,14 @@ public class UserControllerIT {
 
     @Test
     public void twiceRegTheSameUserFail() throws Exception {
-
+        utils.regDefaultUser().andExpect(status().isCreated());
         utils.regDefaultUser().andExpect(status().isUnprocessableEntity());
         assertThat(userRepository.count()).isEqualTo(SIZE_OF_ONE_ITEM_REPOSITORY);
     }
 
     @Test
     public void login() throws Exception {
-
+        utils.regDefaultUser();
         final LoginDto rightCredentials = new LoginDto(TEST_USERNAME_1, "0987");
 
         final var loginRequest = post(LOGIN).content(asJson(rightCredentials)).contentType(APPLICATION_JSON);
@@ -149,7 +137,7 @@ public class UserControllerIT {
 
     @Test
     public void loginFails() throws Exception {
-
+        utils.regDefaultUser();
         final LoginDto wrongCredentials = new LoginDto(TEST_USERNAME_2, "password");
 
         final var loginRequest = post(LOGIN).content(asJson(wrongCredentials)).contentType(APPLICATION_JSON);
@@ -159,7 +147,7 @@ public class UserControllerIT {
 
     @Test
     public void updateUser() throws Exception {
-
+        utils.regDefaultUser();
         final UserDto newUserDto = new UserDto(
                 TEST_USERNAME_2,
                 "new name",
@@ -181,6 +169,7 @@ public class UserControllerIT {
 
     @Test
     public void deleteUser() throws Exception {
+        utils.regDefaultUser();
 
         final Long userId = userRepository.findByEmail(TEST_USERNAME_1).get().getId();
 
@@ -194,7 +183,7 @@ public class UserControllerIT {
 
     @Test
     public void deleteUserFails() throws Exception {
-
+        utils.regDefaultUser();
         final UserDto newUserDto = new UserDto(
                 TEST_USERNAME_2,
                 "fname",

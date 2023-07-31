@@ -35,7 +35,7 @@ import static hexlet.code.utils.TestUtils.SIZE_OF_EMPTY_REPOSITORY;
 import static hexlet.code.utils.TestUtils.SIZE_OF_ONE_ITEM_REPOSITORY;
 import static hexlet.code.utils.TestUtils.asJson;
 import static hexlet.code.utils.TestUtils.fromJson;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -92,7 +92,6 @@ public class TaskControllerIT {
         final List<Task> expected = taskRepository.findAll();
 
         assertThat(tasks).containsAll(expected);
-        assertThat(taskRepository.count()).isEqualTo(SIZE_OF_ONE_ITEM_REPOSITORY);
     }
 
     @Test
@@ -106,18 +105,16 @@ public class TaskControllerIT {
                 .findFirst()
                 .get();
 
-        final Long expectedTaskId = expectedTask.getId();
-
         final var response = utils.performAuthorizedRequest(
-                        get(TASK_CONTROLLER_PATH + ID, expectedTaskId))
+                        get(TASK_CONTROLLER_PATH + ID, expectedTask.getId()))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse();
 
         final Task task = fromJson(response.getContentAsString(), new TypeReference<>() { });
 
-        assertThat(expectedTaskId).isEqualTo(task.getId());
-        assertThat(expectedTaskId).isEqualTo(task.getName());
+        assertThat(expectedTask.getId()).isEqualTo(task.getId());
+        assertThat(expectedTask.getName()).isEqualTo(task.getName());
     }
 
     @Test

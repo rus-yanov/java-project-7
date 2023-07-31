@@ -23,9 +23,10 @@ import static hexlet.code.config.SpringConfigForIT.TEST_PROFILE;
 import static hexlet.code.controller.LabelController.LABEL_CONTROLLER_PATH;
 import static hexlet.code.controller.TaskStatusController.ID;
 import static hexlet.code.utils.TestUtils.SIZE_OF_ONE_ITEM_REPOSITORY;
+import static hexlet.code.utils.TestUtils.SIZE_OF_TWO_ITEM_REPOSITORY;
 import static hexlet.code.utils.TestUtils.asJson;
 import static hexlet.code.utils.TestUtils.fromJson;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -63,12 +64,12 @@ public class LabelControllerIT {
 
         assertThat(labelRepository.count()).isEqualTo(SIZE_OF_ONE_ITEM_REPOSITORY);
 
-        final LabelDto defaultLabelDto = new LabelDto("Default label");
+        final LabelDto newLabel = new LabelDto("New label");
 
         final var response = utils.performAuthorizedRequest(
                         post(LABEL_CONTROLLER_PATH)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(asJson(defaultLabelDto)))
+                                .content(asJson(newLabel)))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse();
 
@@ -76,8 +77,7 @@ public class LabelControllerIT {
         final List<Label> expected = labelRepository.findAll();
 
         assertThat(labels).containsAll(expected);
-        assertThat(labelRepository.count()).isEqualTo(SIZE_OF_ONE_ITEM_REPOSITORY
-                + SIZE_OF_ONE_ITEM_REPOSITORY);
+        assertThat(labelRepository.count()).isEqualTo(SIZE_OF_TWO_ITEM_REPOSITORY);
     }
 
     @Test
@@ -105,8 +105,7 @@ public class LabelControllerIT {
         final LabelDto newLabel = new LabelDto("New label");
         utils.regNewInstance(LABEL_CONTROLLER_PATH, newLabel);
 
-        assertThat(labelRepository.count()).isEqualTo(
-                SIZE_OF_ONE_ITEM_REPOSITORY + SIZE_OF_ONE_ITEM_REPOSITORY);
+        assertThat(labelRepository.count()).isEqualTo(SIZE_OF_TWO_ITEM_REPOSITORY);
 
         final var response = utils.performAuthorizedRequest(
                         get(LABEL_CONTROLLER_PATH))
@@ -143,7 +142,6 @@ public class LabelControllerIT {
         assertThat(labelRepository.existsById(labelId)).isTrue();
         assertThat(labelRepository.findById(labelId).get().getName()).isNotEqualTo(oldLabelName);
         assertThat(labelRepository.findById(labelId).get().getName()).isEqualTo(updatedLabelName);
-
     }
 
     @Test
@@ -156,6 +154,5 @@ public class LabelControllerIT {
                 .andExpect(status().isOk());
 
         assertFalse(labelRepository.existsById(defaultLabelId));
-
     }
 }
