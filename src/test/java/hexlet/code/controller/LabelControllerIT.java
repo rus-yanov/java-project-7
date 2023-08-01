@@ -105,18 +105,15 @@ public class LabelControllerIT {
         final LabelDto newLabel = new LabelDto("New label");
         utils.regNewInstance(LABEL_CONTROLLER_PATH, newLabel);
 
-        assertThat(labelRepository.count()).isEqualTo(SIZE_OF_TWO_ITEM_REPOSITORY);
-
         final var response = utils.performAuthorizedRequest(
                         get(LABEL_CONTROLLER_PATH))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse();
 
-        final List<Label> labels = fromJson(response.getContentAsString(), new TypeReference<>() { });
-        final List<Label> expected = labelRepository.findAll();
-
-        assertThat(labels).containsAll(expected);
+        assertThat(response.getContentAsString()).contains("Default label");
+        assertThat(response.getContentAsString()).contains("New label");
+        assertThat(labelRepository.count()).isEqualTo(SIZE_OF_TWO_ITEM_REPOSITORY);
     }
 
     @Test

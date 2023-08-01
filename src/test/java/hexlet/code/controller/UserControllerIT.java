@@ -76,8 +76,8 @@ public class UserControllerIT {
 
     @Test
     public void getUserById() throws Exception {
-        utils.regDefaultUser();
 
+        utils.regDefaultUser();
         final User expectedUser = userRepository.findAll().get(0);
 
         final var response = utils.performAuthorizedRequest(
@@ -96,6 +96,7 @@ public class UserControllerIT {
 
     @Test
     public void getUserByIdFails() throws Exception {
+
         utils.regDefaultUser();
         final User expectedUser = userRepository.findAll().get(0);
         utils.performAuthorizedRequest(
@@ -105,6 +106,7 @@ public class UserControllerIT {
 
     @Test
     public void getAllUsers() throws Exception {
+
         utils.regDefaultUser();
         final var response = utils.perform(get(USER_CONTROLLER_PATH))
                 .andExpect(status().isOk())
@@ -120,6 +122,7 @@ public class UserControllerIT {
 
     @Test
     public void twiceRegTheSameUserFail() throws Exception {
+
         utils.regDefaultUser().andExpect(status().isCreated());
         utils.regDefaultUser().andExpect(status().isUnprocessableEntity());
         assertThat(userRepository.count()).isEqualTo(SIZE_OF_ONE_ITEM_REPOSITORY);
@@ -127,6 +130,7 @@ public class UserControllerIT {
 
     @Test
     public void login() throws Exception {
+
         utils.regDefaultUser();
         final LoginDto rightCredentials = new LoginDto(TEST_USERNAME_1, "0987");
 
@@ -137,6 +141,7 @@ public class UserControllerIT {
 
     @Test
     public void loginFails() throws Exception {
+
         utils.regDefaultUser();
         final LoginDto wrongCredentials = new LoginDto(TEST_USERNAME_2, "password");
 
@@ -147,6 +152,7 @@ public class UserControllerIT {
 
     @Test
     public void updateUser() throws Exception {
+
         utils.regDefaultUser();
         final UserDto newUserDto = new UserDto(
                 TEST_USERNAME_2,
@@ -169,8 +175,8 @@ public class UserControllerIT {
 
     @Test
     public void deleteUser() throws Exception {
-        utils.regDefaultUser();
 
+        utils.regDefaultUser();
         final Long userId = userRepository.findByEmail(TEST_USERNAME_1).get().getId();
 
         utils.performAuthorizedRequest(
@@ -183,6 +189,7 @@ public class UserControllerIT {
 
     @Test
     public void deleteUserFails() throws Exception {
+
         utils.regDefaultUser();
         final UserDto newUserDto = new UserDto(
                 TEST_USERNAME_2,
