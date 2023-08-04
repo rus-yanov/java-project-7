@@ -36,6 +36,7 @@ import static hexlet.code.utils.TestUtils.SIZE_OF_ONE_ITEM_REPOSITORY;
 import static hexlet.code.utils.TestUtils.asJson;
 import static hexlet.code.utils.TestUtils.fromJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -88,10 +89,12 @@ public class TaskControllerIT {
                 .andExpect(status().isCreated())
                 .andReturn().getResponse();
 
-        final List<Task> tasks = fromJson(response.getContentAsString(), new TypeReference<>() { });
-        final List<Task> expected = taskRepository.findAll();
+        final Task task = fromJson(response.getContentAsString(), new TypeReference<>() { });
+        final Task expected = taskRepository.findAll().get(0);
 
-        assertThat(tasks).containsAll(expected);
+        assertThat(expected.getId()).isEqualTo(task.getId());
+        assertThat(expected.getName()).isEqualTo(task.getName());
+        assertThat(userRepository.count()).isEqualTo(SIZE_OF_ONE_ITEM_REPOSITORY);
     }
 
     @Test
@@ -138,7 +141,6 @@ public class TaskControllerIT {
 
         final TaskDto defaultTask = buildTaskDto();
         getTaskRequest(defaultTask);
-        final String defaultName = taskRepository.findAll().get(0).getName();
 
         final var response = utils.performAuthorizedRequest(
                         get(TASK_CONTROLLER_PATH))
@@ -149,7 +151,12 @@ public class TaskControllerIT {
         final List<Task> tasks = fromJson(response.getContentAsString(), new TypeReference<>() { });
         final List<Task> expected = taskRepository.findAll();
 
-        assertThat(tasks).containsAll(expected);
+        int i = 0;
+        for (var e : tasks) {
+            assertEquals(e.getId(), expected.get(i).getId());
+            assertEquals(e.getName(), expected.get(i).getName());
+            i++;
+        }
     }
 
     @Test

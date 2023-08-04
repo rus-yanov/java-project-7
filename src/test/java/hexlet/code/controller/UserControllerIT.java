@@ -30,6 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -67,10 +68,13 @@ public class UserControllerIT {
                 .andExpect(status().isCreated())
                 .andReturn().getResponse();
 
-        final List<User> users = fromJson(response.getContentAsString(), new TypeReference<>() { });
-        final List<User> expected = userRepository.findAll();
+        final User user = fromJson(response.getContentAsString(), new TypeReference<>() { });
+        final User expectedUser = userRepository.findAll().get(0);
 
-        assertThat(users).containsAll(expected);
+        assertThat(expectedUser.getId()).isEqualTo(user.getId());
+        assertThat(expectedUser.getEmail()).isEqualTo(user.getEmail());
+        assertThat(expectedUser.getFirstName()).isEqualTo(user.getFirstName());
+        assertThat(expectedUser.getLastName()).isEqualTo(user.getLastName());
         assertThat(userRepository.count()).isEqualTo(SIZE_OF_ONE_ITEM_REPOSITORY);
     }
 
@@ -83,11 +87,9 @@ public class UserControllerIT {
         final var response = utils.performAuthorizedRequest(
                         get(USER_CONTROLLER_PATH + ID, expectedUser.getId()))
                 .andExpect(status().isOk())
-                .andReturn()
-                .getResponse();
+                .andReturn().getResponse();
 
-        final User user = fromJson(response.getContentAsString(), new TypeReference<>() {
-        });
+        final User user = fromJson(response.getContentAsString(), new TypeReference<>() { });
         assertThat(expectedUser.getId()).isEqualTo(user.getId());
         assertThat(expectedUser.getEmail()).isEqualTo(user.getEmail());
         assertThat(expectedUser.getFirstName()).isEqualTo(user.getFirstName());
@@ -110,14 +112,20 @@ public class UserControllerIT {
         utils.regDefaultUser();
         final var response = utils.perform(get(USER_CONTROLLER_PATH))
                 .andExpect(status().isOk())
-                .andReturn()
-                .getResponse();
+                .andReturn().getResponse();
 
         final List<User> users = fromJson(response.getContentAsString(), new TypeReference<>() { });
         final List<User> expected = userRepository.findAll();
 
-        assertThat(users).containsAll(expected);
-        assertThat(users).hasSize(SIZE_OF_ONE_ITEM_REPOSITORY);
+        int i = 0;
+        for (var e : users) {
+            assertEquals(e.getId(), expected.get(i).getId());
+            assertEquals(e.getEmail(), expected.get(i).getEmail());
+            assertEquals(e.getFirstName(), expected.get(i).getFirstName());
+            assertEquals(e.getLastName(), expected.get(i).getLastName());
+            i++;
+        }
+        assertThat(userRepository.count()).isEqualTo(SIZE_OF_ONE_ITEM_REPOSITORY);
     }
 
     @Test
@@ -162,12 +170,19 @@ public class UserControllerIT {
 
         final Long userId = userRepository.findByEmail(TEST_USERNAME_1).get().getId();
 
-        utils.performAuthorizedRequest(
+        final var response = utils.performAuthorizedRequest(
                         put(USER_CONTROLLER_PATH + ID, userId)
                                 .content(asJson(newUserDto))
                                 .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andReturn().getResponse();
+        final User user = fromJson(response.getContentAsString(), new TypeReference<>() { });
+        final User expectedUser = userRepository.findAll().get(0);
 
+        assertThat(expectedUser.getId()).isEqualTo(user.getId());
+        assertThat(expectedUser.getEmail()).isEqualTo(user.getEmail());
+        assertThat(expectedUser.getFirstName()).isEqualTo(user.getFirstName());
+        assertThat(expectedUser.getLastName()).isEqualTo(user.getLastName());
         assertThat(userRepository.existsById(userId)).isTrue();
         assertNull(userRepository.findByEmail(TEST_USERNAME_1).orElse(null));
         assertNotNull(userRepository.findByEmail(TEST_USERNAME_2).orElse(null));

@@ -25,6 +25,7 @@ import static hexlet.code.utils.TestUtils.SIZE_OF_ONE_ITEM_REPOSITORY;
 import static hexlet.code.utils.TestUtils.asJson;
 import static hexlet.code.utils.TestUtils.fromJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -64,17 +65,27 @@ public class TaskStatusControllerIT {
 
         final TaskStatusDto statusDto = new TaskStatusDto("Some status");
 
+        utils.performAuthorizedRequest(
+                post(TASK_STATUS_CONTROLLER_PATH)
+                        .content(asJson(statusDto))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isCreated());
+
         final var response = utils.performAuthorizedRequest(
-                        post(TASK_STATUS_CONTROLLER_PATH)
-                                .content(asJson(statusDto))
-                                .contentType(APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andReturn().getResponse();
+                        get(TASK_STATUS_CONTROLLER_PATH))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse();
 
         final List<TaskStatus> taskStatuses = fromJson(response.getContentAsString(), new TypeReference<>() { });
         final List<TaskStatus> expected = taskStatusRepository.findAll();
 
-        assertThat(taskStatuses).containsAll(expected);
+        int i = 0;
+        for (var e : taskStatuses) {
+            assertEquals(e.getId(), expected.get(i).getId());
+            assertEquals(e.getName(), expected.get(i).getName());
+            i++;
+        }
         assertThat(taskStatusRepository.count()).isEqualTo(SIZE_OF_TWO_ITEM_REPOSITORY);
     }
 
@@ -108,8 +119,6 @@ public class TaskStatusControllerIT {
     @Test
     public void getAllStatuses() throws Exception {
 
-        final String defaultName = taskStatusRepository.findAll().get(0).getName();
-
         final var response = utils.performAuthorizedRequest(
                         get(TASK_STATUS_CONTROLLER_PATH))
                 .andExpect(status().isOk())
@@ -119,7 +128,12 @@ public class TaskStatusControllerIT {
         final List<TaskStatus> taskStatuses = fromJson(response.getContentAsString(), new TypeReference<>() { });
         final List<TaskStatus> expected = taskStatusRepository.findAll();
 
-        assertThat(taskStatuses).containsAll(expected);
+        int i = 0;
+        for (var e : taskStatuses) {
+            assertEquals(e.getId(), expected.get(i).getId());
+            assertEquals(e.getName(), expected.get(i).getName());
+            i++;
+        }
     }
 
     @Test
