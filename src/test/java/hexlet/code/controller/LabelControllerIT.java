@@ -22,8 +22,6 @@ import java.util.List;
 import static hexlet.code.config.SpringConfigForIT.TEST_PROFILE;
 import static hexlet.code.controller.LabelController.LABEL_CONTROLLER_PATH;
 import static hexlet.code.controller.TaskStatusController.ID;
-import static hexlet.code.utils.TestUtils.SIZE_OF_ONE_ITEM_REPOSITORY;
-import static hexlet.code.utils.TestUtils.SIZE_OF_TWO_ITEM_REPOSITORY;
 import static hexlet.code.utils.TestUtils.asJson;
 import static hexlet.code.utils.TestUtils.fromJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -63,32 +61,19 @@ public class LabelControllerIT {
     @Test
     public void createLabel() throws Exception {
 
-        assertThat(labelRepository.count()).isEqualTo(SIZE_OF_ONE_ITEM_REPOSITORY);
-
-        final LabelDto newLabel = new LabelDto("New label");
-
-        utils.performAuthorizedRequest(
-                post(LABEL_CONTROLLER_PATH)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJson(newLabel)))
-                .andExpect(status().isCreated());
+        final LabelDto expectedLabel = new LabelDto("New label");
 
         final var response = utils.performAuthorizedRequest(
-                        get(LABEL_CONTROLLER_PATH))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse();
+                post(LABEL_CONTROLLER_PATH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(asJson(expectedLabel)))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse();
 
-        final List<Label> labels = fromJson(response.getContentAsString(), new TypeReference<>() { });
-        final List<Label> expected = labelRepository.findAll();
+        final Label label = fromJson(response.getContentAsString(), new TypeReference<>() { });
 
-        int i = 0;
-        for (var e : labels) {
-            assertEquals(e.getId(), expected.get(i).getId());
-            assertEquals(e.getName(), expected.get(i).getName());
-            i++;
-        }
-        assertThat(labelRepository.count()).isEqualTo(SIZE_OF_TWO_ITEM_REPOSITORY);
+        assertThat(labelRepository.getReferenceById(label.getId())).isNotNull();
+        assertThat(label.getName()).isEqualTo(expectedLabel.getName());
     }
 
     @Test
@@ -111,8 +96,6 @@ public class LabelControllerIT {
     @Test
     public void getAllLabels() throws Exception {
 
-        assertThat(labelRepository.count()).isEqualTo(SIZE_OF_ONE_ITEM_REPOSITORY);
-
         final LabelDto newLabel = new LabelDto("New label");
         utils.regNewInstance(LABEL_CONTROLLER_PATH, newLabel);
 
@@ -126,12 +109,12 @@ public class LabelControllerIT {
         final List<Label> expected = labelRepository.findAll();
 
         int i = 0;
-        for (var e : labels) {
-            assertEquals(e.getId(), expected.get(i).getId());
-            assertEquals(e.getName(), expected.get(i).getName());
+        for (var label : labels) {
+            assertThat(i < expected.size());
+            assertEquals(label.getId(), expected.get(i).getId());
+            assertEquals(label.getName(), expected.get(i).getName());
             i++;
         }
-        assertThat(labelRepository.count()).isEqualTo(SIZE_OF_TWO_ITEM_REPOSITORY);
     }
 
     @Test

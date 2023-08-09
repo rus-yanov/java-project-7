@@ -31,10 +31,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 @Component
 public class TestUtils {
-
-    public static final int SIZE_OF_EMPTY_REPOSITORY = 0;
-    public static final int SIZE_OF_ONE_ITEM_REPOSITORY = 1;
-    public static final int SIZE_OF_TWO_ITEM_REPOSITORY = 2;
     public static final String TEST_USERNAME_1 = "blabla@gmail.com";
     public static final String TEST_USERNAME_2 = "badabudu@gmail.com";
     public static final String LOGIN = "/login";

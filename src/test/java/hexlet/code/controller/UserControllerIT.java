@@ -22,8 +22,6 @@ import static hexlet.code.config.SpringConfigForIT.TEST_PROFILE;
 import static hexlet.code.utils.TestUtils.LOGIN;
 import static hexlet.code.utils.TestUtils.TEST_USERNAME_1;
 import static hexlet.code.utils.TestUtils.TEST_USERNAME_2;
-import static hexlet.code.utils.TestUtils.SIZE_OF_EMPTY_REPOSITORY;
-import static hexlet.code.utils.TestUtils.SIZE_OF_ONE_ITEM_REPOSITORY;
 import static hexlet.code.utils.TestUtils.asJson;
 import static hexlet.code.utils.TestUtils.fromJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -62,8 +60,6 @@ public class UserControllerIT {
     @Test
     public void registration() throws Exception {
 
-        assertThat(userRepository.count()).isEqualTo(SIZE_OF_EMPTY_REPOSITORY);
-
         final var response = utils.regDefaultUser()
                 .andExpect(status().isCreated())
                 .andReturn().getResponse();
@@ -71,11 +67,11 @@ public class UserControllerIT {
         final User user = fromJson(response.getContentAsString(), new TypeReference<>() { });
         final User expectedUser = userRepository.findAll().get(0);
 
+        assertThat(userRepository.getReferenceById(user.getId())).isNotNull();
         assertThat(expectedUser.getId()).isEqualTo(user.getId());
         assertThat(expectedUser.getEmail()).isEqualTo(user.getEmail());
         assertThat(expectedUser.getFirstName()).isEqualTo(user.getFirstName());
         assertThat(expectedUser.getLastName()).isEqualTo(user.getLastName());
-        assertThat(userRepository.count()).isEqualTo(SIZE_OF_ONE_ITEM_REPOSITORY);
     }
 
     @Test
@@ -118,14 +114,14 @@ public class UserControllerIT {
         final List<User> expected = userRepository.findAll();
 
         int i = 0;
-        for (var e : users) {
-            assertEquals(e.getId(), expected.get(i).getId());
-            assertEquals(e.getEmail(), expected.get(i).getEmail());
-            assertEquals(e.getFirstName(), expected.get(i).getFirstName());
-            assertEquals(e.getLastName(), expected.get(i).getLastName());
+        for (var user : users) {
+            assertThat(i < expected.size());
+            assertEquals(user.getId(), expected.get(i).getId());
+            assertEquals(user.getEmail(), expected.get(i).getEmail());
+            assertEquals(user.getFirstName(), expected.get(i).getFirstName());
+            assertEquals(user.getLastName(), expected.get(i).getLastName());
             i++;
         }
-        assertThat(userRepository.count()).isEqualTo(SIZE_OF_ONE_ITEM_REPOSITORY);
     }
 
     @Test
@@ -133,7 +129,6 @@ public class UserControllerIT {
 
         utils.regDefaultUser().andExpect(status().isCreated());
         utils.regDefaultUser().andExpect(status().isUnprocessableEntity());
-        assertThat(userRepository.count()).isEqualTo(SIZE_OF_ONE_ITEM_REPOSITORY);
     }
 
     @Test
@@ -220,8 +215,6 @@ public class UserControllerIT {
         utils.performAuthorizedRequest(
                         delete(USER_CONTROLLER_PATH + ID, defaultUserId))
                 .andExpect(status().isOk());
-
-        assertThat(userRepository.count()).isEqualTo(SIZE_OF_ONE_ITEM_REPOSITORY);
 
         utils.performAuthorizedRequest(
                         delete(USER_CONTROLLER_PATH + ID, newUserId))

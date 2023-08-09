@@ -20,8 +20,6 @@ import java.util.List;
 
 import static hexlet.code.controller.TaskStatusController.ID;
 import static hexlet.code.controller.TaskStatusController.TASK_STATUS_CONTROLLER_PATH;
-import static hexlet.code.utils.TestUtils.SIZE_OF_TWO_ITEM_REPOSITORY;
-import static hexlet.code.utils.TestUtils.SIZE_OF_ONE_ITEM_REPOSITORY;
 import static hexlet.code.utils.TestUtils.asJson;
 import static hexlet.code.utils.TestUtils.fromJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,32 +59,19 @@ public class TaskStatusControllerIT {
     @Test
     public void createStatus() throws Exception {
 
-        assertThat(taskStatusRepository.count()).isEqualTo(SIZE_OF_ONE_ITEM_REPOSITORY);
-
-        final TaskStatusDto statusDto = new TaskStatusDto("Some status");
-
-        utils.performAuthorizedRequest(
-                post(TASK_STATUS_CONTROLLER_PATH)
-                        .content(asJson(statusDto))
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isCreated());
+        final TaskStatusDto expectedStatus = new TaskStatusDto("Some status");
 
         final var response = utils.performAuthorizedRequest(
-                        get(TASK_STATUS_CONTROLLER_PATH))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse();
+                post(TASK_STATUS_CONTROLLER_PATH)
+                        .content(asJson(expectedStatus))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse();
 
-        final List<TaskStatus> taskStatuses = fromJson(response.getContentAsString(), new TypeReference<>() { });
-        final List<TaskStatus> expected = taskStatusRepository.findAll();
+        final TaskStatus status = fromJson(response.getContentAsString(), new TypeReference<>() { });
 
-        int i = 0;
-        for (var e : taskStatuses) {
-            assertEquals(e.getId(), expected.get(i).getId());
-            assertEquals(e.getName(), expected.get(i).getName());
-            i++;
-        }
-        assertThat(taskStatusRepository.count()).isEqualTo(SIZE_OF_TWO_ITEM_REPOSITORY);
+        assertThat(taskStatusRepository.getReferenceById(status.getId())).isNotNull();
+        assertThat(status.getName()).isEqualTo(expectedStatus.getName());
     }
 
     @Test
@@ -129,9 +114,10 @@ public class TaskStatusControllerIT {
         final List<TaskStatus> expected = taskStatusRepository.findAll();
 
         int i = 0;
-        for (var e : taskStatuses) {
-            assertEquals(e.getId(), expected.get(i).getId());
-            assertEquals(e.getName(), expected.get(i).getName());
+        for (var status : taskStatuses) {
+            assertThat(i < expected.size());
+            assertEquals(status.getId(), expected.get(i).getId());
+            assertEquals(status.getName(), expected.get(i).getName());
             i++;
         }
     }

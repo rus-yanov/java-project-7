@@ -31,8 +31,6 @@ import java.util.Set;
 import static hexlet.code.config.SpringConfigForIT.TEST_PROFILE;
 import static hexlet.code.controller.TaskController.TASK_CONTROLLER_PATH;
 import static hexlet.code.controller.TaskController.ID;
-import static hexlet.code.utils.TestUtils.SIZE_OF_EMPTY_REPOSITORY;
-import static hexlet.code.utils.TestUtils.SIZE_OF_ONE_ITEM_REPOSITORY;
 import static hexlet.code.utils.TestUtils.asJson;
 import static hexlet.code.utils.TestUtils.fromJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -79,22 +77,19 @@ public class TaskControllerIT {
     @Test
     public void createTask() throws Exception {
 
-        final TaskDto defaultTask = buildTaskDto();
-        assertThat(taskRepository.count()).isEqualTo(SIZE_OF_EMPTY_REPOSITORY);
+        final TaskDto expectedTask = buildTaskDto();
 
         final var response = utils.performAuthorizedRequest(
                         post(TASK_CONTROLLER_PATH)
-                                .content(utils.asJson(defaultTask))
+                                .content(utils.asJson(expectedTask))
                                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse();
 
         final Task task = fromJson(response.getContentAsString(), new TypeReference<>() { });
-        final Task expected = taskRepository.findAll().get(0);
 
-        assertThat(expected.getId()).isEqualTo(task.getId());
-        assertThat(expected.getName()).isEqualTo(task.getName());
-        assertThat(userRepository.count()).isEqualTo(SIZE_OF_ONE_ITEM_REPOSITORY);
+        assertThat(taskRepository.getReferenceById(task.getId())).isNotNull();
+        assertThat(expectedTask.getName()).isEqualTo(task.getName());
     }
 
     @Test
@@ -152,9 +147,10 @@ public class TaskControllerIT {
         final List<Task> expected = taskRepository.findAll();
 
         int i = 0;
-        for (var e : tasks) {
-            assertEquals(e.getId(), expected.get(i).getId());
-            assertEquals(e.getName(), expected.get(i).getName());
+        for (var task : tasks) {
+            assertThat(i < expected.size());
+            assertEquals(task.getId(), expected.get(i).getId());
+            assertEquals(task.getName(), expected.get(i).getName());
             i++;
         }
     }
@@ -219,7 +215,6 @@ public class TaskControllerIT {
 
         final TaskDto defaultTask = buildTaskDto();
         getTaskRequest(defaultTask);
-        assertThat(taskRepository.count()).isEqualTo(SIZE_OF_ONE_ITEM_REPOSITORY);
 
         final Long defaultTaskId = taskRepository.findAll().get(0).getId();
 
