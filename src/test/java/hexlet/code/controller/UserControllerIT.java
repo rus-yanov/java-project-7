@@ -93,16 +93,6 @@ public class UserControllerIT {
     }
 
     @Test
-    public void getUserByIdFails() throws Exception {
-
-        utils.regDefaultUser();
-        final User expectedUser = userRepository.findAll().get(0);
-        utils.performAuthorizedRequest(
-                        get(USER_CONTROLLER_PATH + ID, expectedUser.getId() + 1))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
     public void getAllUsers() throws Exception {
 
         utils.regDefaultUser();

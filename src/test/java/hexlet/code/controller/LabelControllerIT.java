@@ -79,7 +79,7 @@ public class LabelControllerIT {
     @Test
     public void getLabel() throws Exception {
 
-        final Label expectedLabel = labelRepository.findAll().get(0);
+        final Label expectedLabel = labelRepository.findFirstByOrderById().get();
 
         final var response = utils.performAuthorizedRequest(
                         get(LABEL_CONTROLLER_PATH + ID, expectedLabel.getId()))
@@ -120,7 +120,7 @@ public class LabelControllerIT {
     @Test
     public void updateLabel() throws Exception {
 
-        final Label defaultLabel = labelRepository.findAll().get(0);
+        final Label defaultLabel = labelRepository.findFirstByOrderById().get();
         final Long labelId = defaultLabel.getId();
         final String oldLabelName = defaultLabel.getName();
 
@@ -145,7 +145,7 @@ public class LabelControllerIT {
     @Test
     public void deleteLabel() throws Exception {
 
-        final Long defaultLabelId = labelRepository.findAll().get(0).getId();
+        final Long defaultLabelId = labelRepository.findFirstByOrderById().get().getId();
 
         utils.performAuthorizedRequest(
                         delete(LABEL_CONTROLLER_PATH + ID, defaultLabelId))

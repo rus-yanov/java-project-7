@@ -9,5 +9,6 @@ import java.util.Optional;
 public interface LabelRepository extends JpaRepository<Label, Long> {
 
     Optional<Label> findById(Long id);
+    Optional<Label> findFirstByOrderById();
     List<Label> findAll();
 }

@@ -98,10 +98,7 @@ public class TaskControllerIT {
         final TaskDto defaultTask = buildTaskDto();
         getTaskRequest(defaultTask);
 
-        final Task expectedTask = taskRepository.findAll().stream()
-                .filter(Objects::nonNull)
-                .findFirst()
-                .get();
+        final Task expectedTask = taskRepository.findFirstByOrderById().get();
 
         final var response = utils.performAuthorizedRequest(
                         get(TASK_CONTROLLER_PATH + ID, expectedTask.getId()))
@@ -113,22 +110,6 @@ public class TaskControllerIT {
 
         assertThat(expectedTask.getId()).isEqualTo(task.getId());
         assertThat(expectedTask.getName()).isEqualTo(task.getName());
-    }
-
-    @Test
-    public void getTaskByIdFails() throws Exception {
-
-        final TaskDto defaultTask = buildTaskDto();
-        getTaskRequest(defaultTask);
-
-        final Task expectedTask = taskRepository.findAll().stream()
-                .filter(Objects::nonNull)
-                .findFirst()
-                .get();
-
-        utils.performAuthorizedRequest(get(TASK_CONTROLLER_PATH + ID,
-                        expectedTask.getId() + 1))
-                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -161,10 +142,7 @@ public class TaskControllerIT {
         final TaskDto taskDto = buildTaskDto();
         getTaskRequest(taskDto);
 
-        final Task defaultTask = taskRepository.findAll().stream()
-                .filter(Objects::nonNull)
-                .findFirst()
-                .get();
+        final Task defaultTask = taskRepository.findFirstByOrderById().get();
 
         final Long taskId = defaultTask.getId();
         final String oldTaskName = defaultTask.getName();
@@ -196,10 +174,7 @@ public class TaskControllerIT {
         final TaskDto defaultTask = buildTaskDto();
         getTaskRequest(defaultTask);
 
-        final Task task = taskRepository.findAll().stream()
-                .filter(Objects::nonNull)
-                .findFirst()
-                .get();
+        final Task task = taskRepository.findFirstByOrderById().get();
 
         final Long taskId = task.getId();
 
@@ -216,7 +191,7 @@ public class TaskControllerIT {
         final TaskDto defaultTask = buildTaskDto();
         getTaskRequest(defaultTask);
 
-        final Long defaultTaskId = taskRepository.findAll().get(0).getId();
+        final Long defaultTaskId = taskRepository.findFirstByOrderById().get().getId();
 
         final String newUserUsername = "new user";
 

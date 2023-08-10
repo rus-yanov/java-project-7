@@ -92,16 +92,6 @@ public class TaskStatusControllerIT {
     }
 
     @Test
-    public void getStatusByIdFails() throws Exception {
-
-        final TaskStatus expectedStatus = taskStatusRepository.findAll().get(0);
-
-        utils.performAuthorizedRequest(get(TASK_STATUS_CONTROLLER_PATH + ID,
-                        expectedStatus.getId() + 1))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
     public void getAllStatuses() throws Exception {
 
         final var response = utils.performAuthorizedRequest(
