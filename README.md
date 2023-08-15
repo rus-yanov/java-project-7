@@ -4,7 +4,7 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/defaed3f07cda0a16b4e/maintainability)](https://codeclimate.com/github/rus-yanov/java-project-73/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/defaed3f07cda0a16b4e/test_coverage)](https://codeclimate.com/github/rus-yanov/java-project-73/test_coverage)
 
-<h2><a href="https://project-73.onrender.com"><b>Task Manager app</b></a></h2>
+<h2><a href="https://task-manager-qccd.onrender.com"><b>Task Manager app</b></a></h2>
 <p>Allows to set tasks, assign performers and change their statuses.</p>
 
 ## The stack used:
